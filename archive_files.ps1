@@ -1,46 +1,46 @@
-# Ö¸¶¨7z.exeµÄ°²×°Â·¾¶
+# æŒ‡å®š7z.exeçš„å®‰è£…è·¯å¾„
 $7zPath = "D:\Program Files\7-Zip\7z.exe"
 
 if (-Not (Test-Path $7zPath)) {
-    Write-Host "Î´ÕÒµ½7z.exe³ÌĞò£¬ÇëÈ·ÈÏ°²×°Â·¾¶ÊÇ·ñÕıÈ·¡£"
+    Write-Host "æœªæ‰¾åˆ°7z.exeç¨‹åºï¼Œè¯·ç¡®è®¤å®‰è£…è·¯å¾„æ˜¯å¦æ­£ç¡®ã€‚"
     Pause
     exit
 }
 
-# ÌáÊ¾ÓÃ»§ÊäÈëÊä³öÄ¿Â¼
-$outputRootDir = Read-Host "ÇëÊäÈëÊä³öÄ¿Â¼µÄÍêÕûÂ·¾¶£¨É¾µôÒıºÅ£¬·ñÔò»á±¨´í£©"
+# æç¤ºç”¨æˆ·è¾“å…¥è¾“å‡ºç›®å½•
+$outputRootDir = Read-Host "è¯·è¾“å…¥è¾“å‡ºç›®å½•çš„å®Œæ•´è·¯å¾„ï¼ˆåˆ æ‰å¼•å·ï¼Œå¦åˆ™ä¼šæŠ¥é”™ï¼‰"
 
 if ([string]::IsNullOrWhiteSpace($outputRootDir)) {
-    Write-Host "Êä³öÂ·¾¶²»ÄÜÎª¿Õ£¬½Å±¾ÒÑÖÕÖ¹¡£"
+    Write-Host "è¾“å‡ºè·¯å¾„ä¸èƒ½ä¸ºç©ºï¼Œè„šæœ¬å·²ç»ˆæ­¢ã€‚"
     Pause
     exit
 }
 
-# »ñÈ¡µ±Ç°½Å±¾ËùÔÚÄ¿Â¼×÷ÎªÔ´Ä¿Â¼
+# è·å–å½“å‰è„šæœ¬æ‰€åœ¨ç›®å½•ä½œä¸ºæºç›®å½•
 $sourceDir = $PSScriptRoot
 
-# »ñÈ¡µ±Ç°Ä¿Â¼¼°ËùÓĞ×ÓÎÄ¼ş¼ĞÖĞµÄÎÄ¼ş£¬²¢ÅÅ³ı½Å±¾ÎÄ¼ş×ÔÉí
+# è·å–å½“å‰ç›®å½•åŠæ‰€æœ‰å­æ–‡ä»¶å¤¹ä¸­çš„æ–‡ä»¶ï¼Œå¹¶æ’é™¤è„šæœ¬æ–‡ä»¶è‡ªèº«
 $files = Get-ChildItem -Path $sourceDir -Recurse -File | Where-Object { $_.FullName -ne $MyInvocation.MyCommand.Path }
 
 foreach ($file in $files) {
-    # ¼ÆËãµ±Ç°ÎÄ¼şËùÔÚÄ¿Â¼Ïà¶ÔÓÚÔ´Ä¿Â¼µÄÏà¶ÔÂ·¾¶
+    # è®¡ç®—å½“å‰æ–‡ä»¶æ‰€åœ¨ç›®å½•ç›¸å¯¹äºæºç›®å½•çš„ç›¸å¯¹è·¯å¾„
     $regexPattern = "^" + [regex]::Escape($sourceDir)
     $relativePath = $file.DirectoryName -replace $regexPattern, ""
     $relativePath = $relativePath.TrimStart('\')
     
-    # Æ´½Ó²¢¼ì²éÊä³öÄ¿Â¼Ê÷½á¹¹£¬Èô²»´æÔÚÔòÖğ²ã´´½¨
+    # æ‹¼æ¥å¹¶æ£€æŸ¥è¾“å‡ºç›®å½•æ ‘ç»“æ„ï¼Œè‹¥ä¸å­˜åœ¨åˆ™é€å±‚åˆ›å»º
     $targetDir = Join-Path -Path $outputRootDir -ChildPath $relativePath
     if (-not (Test-Path $targetDir)) {
         New-Item -ItemType Directory -Force -Path $targetDir | Out-Null
     }
 
-    # ¶¨ÒåÄ¿±êÑ¹Ëõ°üµÄÎÄ¼şÃû¼°ÍêÕûÂ·¾¶
+    # å®šä¹‰ç›®æ ‡å‹ç¼©åŒ…çš„æ–‡ä»¶ååŠå®Œæ•´è·¯å¾„
     $zipName = "$($file.BaseName).zip"
     $targetPath = Join-Path -Path $targetDir -ChildPath $zipName
 
-    # µ÷ÓÃ7zÖ´ĞĞÑ¹Ëõ£º¸ñÊ½ZIP£¬½ö´æ´¢(mx0)£¬ÃÜÂë123456
+    # è°ƒç”¨7zæ‰§è¡Œå‹ç¼©ï¼šæ ¼å¼ZIPï¼Œä»…å­˜å‚¨(mx0)ï¼Œå¯†ç 123456
     & $7zPath a -tzip -mx0 -p123456 "$targetPath" "$($file.FullName)"
 }
 
-Write-Host "È«²¿ÎÄ¼ş´¦ÀíÍê±Ï£¬ÒÑ°´Ô­Ä¿Â¼½á¹¹Êä³öÖÁ: $outputRootDir"
+Write-Host "å…¨éƒ¨æ–‡ä»¶å¤„ç†å®Œæ¯•ï¼Œå·²æŒ‰åŸç›®å½•ç»“æ„è¾“å‡ºè‡³: $outputRootDir"
 Pause
